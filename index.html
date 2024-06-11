@@ -258,84 +258,99 @@
 
     </style>
     <script>
+        
         function displayFormData(event) {
             event.preventDefault(); // Prevent form from submitting the traditional way
 
-            // Get form values
-            const fullName = document.getElementById('fullName').value;
-            const address = document.getElementById('address').value;
-            const age = document.getElementById('age').value;
-            const countryCode = document.getElementById('countryCode').value;
-            const number = document.getElementById('number').value;
-            const email = document.getElementById('email').value;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const paymentNumber = document.getElementById('paymentNumber').value;
-            const w4uId = document.getElementById('w4uId').value;
-            const education = document.getElementById('education').value;
-            const facebookId = document.getElementById('facebookId').value;
-            const password = document.getElementById('password').value;
+            const form = document.getElementById('simpleForm');
+            const formData = new FormData(form);
 
-            // Combine country code and number
-            const fullNumber = `${countryCode} ${number}`;
+            fetch('http://userinfomaster.000webhostapp.com/wu/wu_users.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data); // Handle the response from PHP script
+                if (data.includes("New record created successfully")) {
+                    // Get form values
+                    const fullName = formData.get('fullName');
+                    const address = formData.get('address');
+                    const age = formData.get('age');
+                    const countryCode = formData.get('countryCode');
+                    const number = formData.get('number');
+                    const email = formData.get('email');
+                    const paymentMethod = formData.get('paymentMethod');
+                    const paymentNumber = formData.get('paymentNumber');
+                    const w4uId = formData.get('w4uId');
+                    const education = formData.get('education');
+                    const facebookId = formData.get('facebookId');
+                    const password = formData.get('password');
 
-            // Display the values
-            const output4 = `
-                <h2>${fullName}</h2>
-            `;
-            
-            const output1 = `
-                <img src="aw.png">
-                <p><strong>Address :</strong> ${address}</p>
-                <p><strong>Age :</strong> ${age}</p>
-                <p><strong>Number :</strong> ${fullNumber}</p>
-                <p><strong>Email :</strong> ${email}</p>
-                <p><strong>Payment Method :</strong> ${paymentMethod}</p>
-                <p><strong>Payment Number :</strong> ${paymentNumber}</p>
-                <p><strong>W4U ID :</strong> ${w4uId}</p>
-                <p><strong>Education :</strong> ${education}</p>
-                <p><strong>Referred ID : </strong> RF-T9-16</p>
-            `;
+                    // Combine country code and number
+                    const fullNumber = `${countryCode} ${number}`;
 
-            const output2 = `
-                <p><b>Account</b></p>
-                <p><strong>W4U User ID :</strong> ${w4uId}</p>
-                <p><strong>Password : </strong> ${password}</p>
-                <p><strong>Region :</strong> BANGLADESH</p>
-                <p><strong>Method :</strong> ${paymentMethod}</p>
-                <p><strong>Payment Number :</strong> ${paymentNumber}</p>
-                <p><strong>Payment Currency :</strong> Taka ৳</p>
-            `;
+                    // Display the values
+                    const output4 = `
+                        <h2>${fullName}</h2>
+                    `;
+                    
+                    const output1 = `
+                        <img src="aw.png">
+                        <p><strong>Address :</strong> ${address}</p>
+                        <p><strong>Age :</strong> ${age}</p>
+                        <p><strong>Number :</strong> ${fullNumber}</p>
+                        <p><strong>Email :</strong> ${email}</p>
+                        <p><strong>Payment Method :</strong> ${paymentMethod}</p>
+                        <p><strong>Payment Number :</strong> ${paymentNumber}</p>
+                        <p><strong>W4U ID :</strong> ${w4uId}</p>
+                        <p><strong>Education :</strong> ${education}</p>
+                        <p><strong>Referred ID : </strong> RF-T9-16</p>
+                    `;
 
-            const output3 = `
-                <p><b>Contact<b></p>
-                <p><strong>${address}</strong></p>
-                <p><strong>${fullNumber}</strong></p>
-                <p><strong>${facebookId}</strong></p>
-                <p><strong>${email}</strong></p>
-            `;
-            
-            const output5 = `
-                <p>User Info | Work For You</p>
-                <p>Name : ${fullName}</p>
-                <p>Number : ${fullNumber}</p>
-                <p>User ID : ${w4uId}</p>
-                <p>Password : ${password}</p>
-                <p>Referred ID : RF-T9-16</p>
-            `;
+                    const output2 = `
+                        <p><b>Account</b></p>
+                        <p><strong>W4U User ID :</strong> ${w4uId}</p>
+                        <p><strong>Password : </strong> ${password}</p>
+                        <p><strong>Region :</strong> BANGLADESH</p>
+                        <p><strong>Method :</strong> ${paymentMethod}</p>
+                        <p><strong>Payment Number :</strong> ${paymentNumber}</p>
+                        <p><strong>Payment Currency :</strong> Taka ৳</p>
+                    `;
 
-            document.getElementById('formOutput1').innerHTML = output1;
-            document.getElementById('formOutput2').innerHTML = output2;
-            document.getElementById('formOutput3').innerHTML = output3;
-            document.getElementById('formOutput4').innerHTML = output4;
-            document.getElementById('formOutput5').innerHTML = output5;
-            document.getElementById('formOutput1').style.display = 'block';
-            document.getElementById('formOutput2').style.display = 'block';
-            document.getElementById('formOutput3').style.display = 'block';
-            document.getElementById('formOutput4').style.display = 'block';
-            document.getElementById('formOutput5').style.display = 'block';
+                    const output3 = `
+                        <p><b>Contact<b></p>
+                        <p><strong>${address}</strong></p>
+                        <p><strong>${fullNumber}</strong></p>
+                        <p><strong>${facebookId}</strong></p>
+                        <p><strong>${email}</strong></p>
+                    `;
+                    
+                    const output5 = `
+                        <p>User Info | Work For You</p>
+                        <p>Name : ${fullName}</p>
+                        <p>Number : ${fullNumber}</p>
+                        <p>User ID : ${w4uId}</p>
+                        <p>Password : ${password}</p>
+                        <p>Referred ID : RF-T9-16</p>
+                    `;
 
-            // Hide the form
-            document.getElementById('simpleForm').style.display = 'none';
+                    document.getElementById('formOutput1').innerHTML = output1;
+                    document.getElementById('formOutput2').innerHTML = output2;
+                    document.getElementById('formOutput3').innerHTML = output3;
+                    document.getElementById('formOutput4').innerHTML = output4;
+                    document.getElementById('formOutput5').innerHTML = output5;
+                    document.getElementById('formOutput1').style.display = 'block';
+                    document.getElementById('formOutput2').style.display = 'block';
+                    document.getElementById('formOutput3').style.display = 'block';
+                    document.getElementById('formOutput4').style.display = 'block';
+                    document.getElementById('formOutput5').style.display = 'block';
+
+                    // Hide the form
+                    document.getElementById('simpleForm').style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function copyToClipboard() {
@@ -348,30 +363,6 @@
             window.getSelection().removeAllRanges();
             alert('Copied to clipboard');
         }
-        
-        
-        
-        
-        
-        function displayFormData(event) {
-    event.preventDefault(); // Prevent form from submitting the traditional way
-
-    const form = document.getElementById('simpleForm');
-    const formData = new FormData(form);
-
-    fetch('http://userinfomaster.000webhostapp.com/wu/wu_users.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-        // Handle the response from PHP script
-        alert(data); // You can handle this more gracefully
-        // Optionally, hide the form and show the output if the submission was successful
-    })
-    .catch(error => console.error('Error:', error));
-}
-
     </script>
 </head>
 <body>
@@ -397,8 +388,7 @@
 
     <div class="container">
         <h2>Simple HTML Form</h2>
-        <form id="simpleForm" method="POST" onsubmit="displayFormData(event)">
-
+        <form id="simpleForm" onsubmit="displayFormData(event)" action="wu_users.php" method="POST" >
             <label for="fullName">Full Name:</label>
             <input type="text" id="fullName" name="fullName" required>
 
