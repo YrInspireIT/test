@@ -3,366 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS লগইন, কুকি, ব্যালেন্স ও প্রোফাইল (Google Sheet)</title>
+    <title>User Login</title>
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
-        #login-section, #user-info, #profile-page {
-            margin-bottom: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+        body { font-family: sans-serif; padding: 20px; }
+        label { display: block; margin-bottom: 5px; }
         input[type="text"], input[type="password"] {
-            width: calc(100% - 22px);
-            padding: 10px;
+            width: 250px;
+            padding: 8px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
         button {
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 1em;
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #loading-indicator {
-            display: none; /* Initially hidden */
-            color: blue;
-            margin-left: 10px;
-            font-style: italic;
-        }
-        #login-error {
-            color: red;
-            display: none; /* Initially hidden */
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        #user-info, #profile-details, #profile-not-logged-in {
-            display: none; /* Initially hidden until login/check */
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-        li strong {
-            display: inline-block;
-            min-width: 100px; /* Align labels */
-            color: #555;
-        }
-        .balance-display {
-            font-weight: bold;
-            color: green;
-            font-size: 1.1em;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        hr {
-            margin: 30px 0;
-            border: 0;
-            border-top: 1px solid #eee;
-        }
+        button:hover { background-color: #45a049; }
+        #message { margin-top: 20px; font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+        #loading { display: none; margin-top: 10px; } /* লোডিং ইন্ডিকেটর */
     </style>
 </head>
 <body>
 
-    <h1>ওয়েবসাইট টাইটেল</h1>
-    <p>সম্পূর্ণ ক্লায়েন্ট-সাইড JavaScript এবং Google Sheet ব্যবহার করে লগইন সিস্টেম।</p>
-    <p style="color:orange; font-weight:bold;">সতর্কতা: এই পদ্ধতিটি নিরাপত্তার দিক থেকে অত্যন্ত ঝুঁকিপূর্ণ এবং প্রোডাকশন ব্যবহারের জন্য অনুপযুক্ত। এটি শুধুমাত্র ডেমো বা শেখার উদ্দেশ্যে তৈরি।</p>
+    <h1>Login</h1>
 
-    <!-- লগইন সেকশন -->
-    <div id="login-section">
-        <h2>লগইন করুন</h2>
-        <form id="login-form">
-            <label for="username">ইউজারনেম:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">পাসওয়ার্ড:</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">লগইন</button>
-            <span id="loading-indicator">লোড হচ্ছে...</span>
-            <p id="login-error"></p>
-        </form>
+    <div>
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" name="userId">
     </div>
 
-    <!-- ইউজার লগইন করা থাকলে দেখানোর সেকশন -->
-    <div id="user-info">
-        <h2>স্বাগতম, <span id="user-name-display"></span>!</h2>
-        <p>আপনার বর্তমান ব্যালেন্স: <span id="user-balance-display" class="balance-display"></span></p>
-        <p>আপনি সফলভাবে লগইন করেছেন।</p>
-        <p><a href="#profile-page">প্রোফাইল দেখুন (এই পেজেই)</a></p>
-        <button id="logout-button">লগআউট</button>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
     </div>
 
-    <!-- প্রোফাইল পেজের কনটেন্ট (একই পেজে দেখানো হবে) -->
-    <div id="profile-page">
-         <h2>আপনার প্রোফাইল</h2>
-         <div id="profile-details">
-             <ul>
-                 <li><strong>ইউজার আইডি:</strong> <span id="profile-user-id"></span></li>
-                 <li><strong>নাম:</strong> <span id="profile-name"></span></li>
-                 <li><strong>ইমেইল:</strong> <span id="profile-email"></span></li>
-                 <li><strong>নাম্বার:</strong> <span id="profile-number"></span></li>
-                 <li><strong>রেফারেল কোড:</strong> <span id="profile-referral"></span></li>
-                 <li><strong>ব্যালেন্স:</strong> <span id="profile-balance" class="balance-display"></span></li>
-             </ul>
-             <button id="logout-button-profile">লগআউট</button>
-         </div>
-         <p id="profile-not-logged-in">প্রোফাইল দেখতে অনুগ্রহ করে লগইন করুন।</p>
-    </div>
+    <button onclick="verifyCredentials()">Verify</button>
 
-    <hr>
-    <p>এটি সাইটের সাধারণ কনটেন্ট, যা লগইন করা বা না করা উভয় অবস্থাতেই দেখা যাবে।</p>
-
+    <div id="loading">Verifying... Please wait.</div>
+    <div id="message"></div>
 
     <script>
-        // ========================================================================
-        // !!! অত্যন্ত গুরুত্বপূর্ণ: এখানে আপনার ডিप्लয় করা Google Apps Script Web App URL টি পেস্ট করুন !!!
-        // নিশ্চিত করুন যে Apps Script CORS হেডার সহ সঠিকভাবে ডিप्लয় করা হয়েছে।
-        // ========================================================================
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx6eVajIMFPK0xlKK6yRmCN0bGmAgstWSO4vVBXD4tNgwKD16W6sa3dZ667R8R4ISgS/exec'; // <--- REPLACE THIS!
+        // আপনার Google Apps Script Web App URL এখানে পেস্ট করুন
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwgmXpTFYxmToAUssszmwXS_rd0s-oC9KftzP_LhvGXvDO92WuFtWjzJ1PIXOGwTDY/exec';
 
-        if (GAS_WEB_APP_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-            alert("অনুগ্রহ করে JavaScript কোডে আপনার Google Apps Script Web App URL সেট করুন!");
-        }
+        async function verifyCredentials() {
+            const userIdInput = document.getElementById('userId');
+            const passwordInput = document.getElementById('password');
+            const messageDiv = document.getElementById('message');
+            const loadingDiv = document.getElementById('loading'); // লোডিং ইন্ডিকেটর
 
-        // --- DOM Element References ---
-        const loginSection = document.getElementById('login-section');
-        const userInfoSection = document.getElementById('user-info');
-        const profilePageSection = document.getElementById('profile-page');
-        const profileDetailsSection = document.getElementById('profile-details');
-        const profileNotLoggedInMsg = document.getElementById('profile-not-logged-in');
+            const userId = userIdInput.value.trim();
+            const password = passwordInput.value.trim();
 
-        const loginForm = document.getElementById('login-form');
-        const logoutButton = document.getElementById('logout-button');
-        const logoutButtonProfile = document.getElementById('logout-button-profile');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const loginErrorMsg = document.getElementById('login-error');
-
-        // --- Cookie Helper Functions ---
-        function setCookie(name, value, days) {
-            let expires = "";
-            if (days) {
-                const date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
+            // ইনপুট খালি কিনা চেক করুন
+            if (!userId || !password) {
+                messageDiv.textContent = 'Please enter both User ID and Password.';
+                messageDiv.className = 'error';
+                return;
             }
-            // Encode value to handle special characters, spaces, and JSON structure
-            document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/; SameSite=Lax"; // Added SameSite for modern browsers
-        }
 
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-                if (c.indexOf(nameEQ) === 0) {
-                    try {
-                        // Decode the value before returning
-                        return decodeURIComponent(c.substring(nameEQ.length, c.length));
-                    } catch(e) {
-                        console.error("Error decoding cookie:", name, e);
-                        return null; // Return null if decoding fails
-                    }
-                }
-            }
-            return null;
-        }
+            // আগের মেসেজ মুছে দিন এবং লোডিং দেখান
+            messageDiv.textContent = '';
+            messageDiv.className = '';
+            loadingDiv.style.display = 'block';
 
-        function deleteCookie(name) {
-            // Set expiry date to the past to delete the cookie
-            document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax';
-        }
-
-        // --- Balance Formatting Function ---
-        function formatBalance(amount) {
-            if (typeof amount !== 'number' || isNaN(amount)) {
-                return "তথ্য নেই"; // Or '0.00' or other default
-            }
-            // Format to 2 decimal places (adjust currency symbol/locale as needed)
-            return amount.toFixed(2) + ' টাকা'; // Example currency formatting
-        }
-
-        // --- UI Update Functions ---
-        function showLoggedInState(userData) {
-            loginSection.style.display = 'none';
-            userInfoSection.style.display = 'block';
-            profilePageSection.style.display = 'block'; // Show profile section container
-            profileDetailsSection.style.display = 'block'; // Show details within profile
-            profileNotLoggedInMsg.style.display = 'none'; // Hide "please log in" message
-
-            // Populate User Info section
-            document.getElementById('user-name-display').textContent = userData.name ?? 'ব্যবহারকারী';
-            document.getElementById('user-balance-display').textContent = formatBalance(userData.balance);
-
-            // Populate Profile Details section
-            document.getElementById('profile-user-id').textContent = userData.user_id ?? 'N/A';
-            document.getElementById('profile-name').textContent = userData.name ?? 'N/A';
-            document.getElementById('profile-email').textContent = userData.email ?? 'N/A';
-            document.getElementById('profile-number').textContent = userData.number ?? 'N/A';
-            document.getElementById('profile-referral').textContent = userData.referral ?? 'N/A';
-            document.getElementById('profile-balance').textContent = formatBalance(userData.balance);
-        }
-
-        function showLoggedOutState() {
-            loginSection.style.display = 'block';
-            userInfoSection.style.display = 'none';
-            // Keep profile section container visible, but hide details and show login prompt
-            profilePageSection.style.display = 'block';
-            profileDetailsSection.style.display = 'none';
-            profileNotLoggedInMsg.style.display = 'block';
-
-            loginErrorMsg.style.display = 'none'; // Hide any previous errors
-            loginErrorMsg.textContent = '';
-             if(loginForm) loginForm.reset(); // Clear form fields
-        }
-
-        // --- Event Handlers ---
-
-        // Login Form Submission
-        if (loginForm) {
-            loginForm.addEventListener('submit', function(event) {
-                event.preventDefault(); // Stop default form submission
-                loadingIndicator.style.display = 'inline'; // Show spinner/text
-                loginErrorMsg.style.display = 'none'; // Hide previous error
-                loginErrorMsg.textContent = '';
-
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                // --- Call Google Apps Script via Fetch ---
-                fetch(GAS_WEB_APP_URL, {
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
-                    // mode: 'cors', // Default, ensure Apps Script handles CORS correctly
+                    mode: 'cors', // CORS হ্যান্ডেলিং এর জন্য দরকার হতে পারে
+                    cache: 'no-cache',
                     headers: {
-                       'Content-Type': 'application/json' // Must match what GAS expects and allows
-                     },
-                    // redirect: 'follow', // Default is usually fine
-                    body: JSON.stringify({ username: username, password: password }) // Send data as JSON
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        // Handle HTTP errors (like 404, 500, CORS issues if not caught earlier)
-                        throw new Error(`সার্ভার ত্রুটি: ${response.status} ${response.statusText}`);
-                    }
-                     // Check content type before parsing if needed (optional)
-                     // const contentType = response.headers.get("content-type");
-                     // if (contentType && contentType.indexOf("application/json") !== -1) { ... }
-                    return response.json(); // Parse the JSON response from GAS
-                })
-                .then(data => {
-                    loadingIndicator.style.display = 'none'; // Hide loading
-
-                    if (data.user) {
-                        // --- Login Successful ---
-                        const userData = data.user;
-                        // Store all user data in the cookie as a JSON string
-                        setCookie('useryi', JSON.stringify(userData), 30); // Store for 30 days
-                        showLoggedInState(userData); // Update UI
-
-                    } else {
-                        // --- Login Failed (as reported by GAS) ---
-                        let errorText = 'লগইন ব্যর্থ হয়েছে। ';
-                        if (data.error) {
-                             errorText += ` কারণ: ${data.error}`; // Show specific error from GAS if available
-                             console.error("Google Apps Script Error:", data.details);
-                        } else {
-                            errorText += 'ইউজারনেম বা পাসওয়ার্ড সঠিক নয়।';
-                        }
-                         loginErrorMsg.textContent = errorText;
-                         loginErrorMsg.style.display = 'block';
-                         showLoggedOutState(); // Ensure UI is in logged-out state
-                    }
-                })
-                .catch(error => {
-                    // --- Fetch or Network Error ---
-                    loadingIndicator.style.display = 'none'; // Hide loading
-                    loginErrorMsg.textContent = `একটি ত্রুটি ঘটেছে: ${error.message}. অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ এবং Apps Script URL পরীক্ষা করুন।`;
-                    loginErrorMsg.style.display = 'block';
-                    console.error('Fetch Error:', error);
-                    showLoggedOutState(); // Ensure UI is in logged-out state
+                        'Content-Type': 'application/json',
+                    },
+                    redirect: 'follow',
+                    // ডেটা JSON স্ট্রিং হিসাবে পাঠান
+                    body: JSON.stringify({ userId: userId, password: password })
                 });
-            });
-        }
 
-        // Logout Function
-        function handleLogout() {
-             deleteCookie('useryi'); // Remove the user cookie
-             showLoggedOutState(); // Update UI to logged-out view
-             // Optional: Scroll to top or login section
-             // window.scrollTo(0, 0);
-        }
+                // লোডিং লুকান
+                loadingDiv.style.display = 'none';
 
-        // Logout Button Click (for general user-info section)
-        if(logoutButton) {
-            logoutButton.addEventListener('click', handleLogout);
-        }
-
-        // Logout Button Click (for profile page section)
-        if(logoutButtonProfile) {
-            logoutButtonProfile.addEventListener('click', handleLogout);
-        }
-
-        // --- Initial Page Load Check ---
-        // Runs when the page content is fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            const userCookieData = getCookie('useryi'); // Check if 'useryi' cookie exists
-
-            if (userCookieData) {
-                try {
-                    // Attempt to parse the JSON data stored in the cookie
-                    const userData = JSON.parse(userCookieData);
-
-                    // Basic check if parsed data looks like a valid user object
-                    if (userData && userData.user_id && userData.name) {
-                       showLoggedInState(userData); // Update UI to logged-in state
-                    } else {
-                        // Data in cookie is invalid or incomplete
-                        console.warn("Invalid data found in 'useryi' cookie.");
-                        deleteCookie('useryi'); // Clear the corrupted cookie
-                        showLoggedOutState(); // Show logged-out state
-                    }
-                } catch (e) {
-                    // Error parsing JSON from cookie (corrupted cookie)
-                    console.error("Error parsing 'useryi' cookie:", e);
-                    deleteCookie('useryi'); // Clear the corrupted cookie
-                    showLoggedOutState(); // Show logged-out state
+                if (!response.ok) {
+                   // HTTP এরর (যেমন 404, 500) হলে
+                   throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            } else {
-                // No 'useryi' cookie found, show the logged-out state
-                showLoggedOutState();
-            }
-        });
 
+                const result = await response.json(); // Apps Script থেকে আসা JSON ডেটা
+
+                if (result.status === 'success') {
+                    messageDiv.textContent = result.message;
+                    messageDiv.className = 'success';
+                    // লগইন সফল হলে অন্য কোনো পেজে রিডাইরেক্ট করতে পারেন
+                    // window.location.href = 'dashboard.html';
+                } else {
+                    messageDiv.textContent = result.message; // যেমন: "Invalid User ID or Password"
+                    messageDiv.className = 'error';
+                }
+
+            } catch (error) {
+                // নেটওয়ার্ক বা অন্য কোনো সমস্যা হলে
+                loadingDiv.style.display = 'none'; // লোডিং লুকান
+                console.error('Error during verification:', error);
+                messageDiv.textContent = 'An error occurred: ' + error.message;
+                messageDiv.className = 'error';
+            }
+        }
     </script>
 
 </body>
-                                                                                                            </html>
+</html>
